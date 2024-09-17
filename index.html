@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos a la venta</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: auto;
+        }
+        .category-section {
+            margin-bottom: 30px;
+        }
+        .category-title {
+            background-color: #e9ecef;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #343a40;
+            transition: background-color 0.3s ease;
+        }
+        .category-title:hover {
+            background-color: #ced4da;
+        }
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .product-card {
+            margin: 10px;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
+            max-width: 250px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        @media (min-width: 576px) {
+            .product-card {
+                flex: 0 0 48%; /* Two products per row on small screens */
+            }
+        }
+        @media (min-width: 768px) {
+            .product-card {
+                flex: 0 0 30%; /* Three products per row on medium screens */
+            }
+        }
+        @media (min-width: 992px) {
+            .product-card {
+                flex: 0 0 23%; /* Four products per row on large screens */
+            }
+        }
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .product-card img:hover {
+            transform: scale(1.1);
+        }
+        .product-id {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            padding: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+        }
+        .modal-body img {
+            max-width: 100%;
+            height: auto;
+        }
+        .login-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            animation: bounce 1s infinite;
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <button type="button" class="btn login-button" data-toggle="modal" data-target="#loginModal">
+            Login
+        </button>
+
+        <h2>Productos a la venta</h2>
+        <div id="successMessage" class="alert alert-success" style="display: none;">
+            Producto agregado exitosamente.
+        </div>
+        <div id="productSections">
+            <!-- Aquí se mostrarán las secciones de productos por categoría -->
+        </div>
+    </div>
+
+    <!-- Modal de Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <input type="text" id="username" class="form-control" placeholder="Usuario" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles del Producto -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" role="dialog" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productDetailModalLabel">Detalles del Producto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="Producto">
+                    <p id="modalCategory"></p>
+                    <p id="modalPrice"></p>
+                    <p id="modalSize"></p>
+                    <p id="modalGender"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productSections = document.getElementById('productSections');
+
+            // Show success message if present in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                document.getElementById('successMessage').style.display = 'block';
+            }
+
+            // Get products from localStorage
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+
+            // Categorías para crear secciones
+            const categories = ['Camiseta', 'Chompa', 'Buzos', 'Zapatos'];
+
+            categories.forEach(category => {
+                // Crear sección para cada categoría
+                const section = document.createElement('div');
+                section.classList.add('category-section');
+
+                const title = document.createElement('h3');
+                title.classList.add('category-title');
+                title.textContent = category;
+
+                const container = document.createElement('div');
+                container.classList.add('product-container');
+
+                // Filtrar productos por categoría
+                const categoryProducts = products.filter(product => product.category === category);
+                categoryProducts.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.classList.add('product-card');
+
+                    productCard.innerHTML = `
+                        <div class="product-id">${product.id}</div>
+                        <img src="${product.image}" alt="Producto" onclick="showProductDetails('${product.id}', '${product.category}', ${product.price}, '${product.size}', '${product.gender}', '${product.image}')">
+                    `;
+
+                    container.appendChild(productCard);
+                });
+
+                section.appendChild(title);
+                section.appendChild(container);
+                productSections.appendChild(section);
+            });
+
+            // Login functionality
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (username === '1' && password === '1') {
+                    // Redirigir a aggProductos.html
+                    window.location.href = 'aggProductos.html';
+                } else {
+                    alert('Usuario o contraseña incorrectos');
+                }
+            });
+        });
+
+        function showProductDetails(id, category, price, size, gender, image) {
+            document.getElementById('modalCategory').textContent = `Categoría: ${category}`;
+            document.getElementById('modalPrice').textContent = `Precio: $${price}`;
+            document.getElementById('modalSize').textContent = `Talla: ${size}`;
+            document.getElementById('modalGender').textContent = `Género: ${gender}`;
+            document.getElementById('modalImage').src = image;
+
+            $('#productDetailModal').modal('show');
+        }
+    </script>
+</body>
+</html>
